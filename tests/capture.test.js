@@ -308,6 +308,53 @@ test("fallback refuses to save a stitched image with repeated viewports", async 
   assert.equal(f.calls.filter(([name]) => name === "detach").length, 1);
 });
 
+test("a partial second viewport is checked and recaptured instead of saving repeated output", async () => {
+  const f = fixture();
+  let position = { x: 0, y: 300 };
+  let captures = 0;
+  let notified = false;
+  f.api.debugger.sendCommand = async (target, method, params) => {
+    f.calls.push([method, target, params]);
+    if (method === "Page.getLayoutMetrics") return {
+      cssContentSize: { x: 0, y: 0, width: 1900, height: 1599 },
+      cssVisualViewport: { clientWidth: 1900, clientHeight: 989 }
+    };
+    if (method === "Emulation.setDeviceMetricsOverride") throw new Error("unavailable");
+    if (method === "Runtime.evaluate") {
+      const match = params.expression.match(/left: ([\d.]+), top: ([\d.]+)/);
+      if (match) position = { x: Number(match[1]), y: Math.min(Number(match[2]), 610) };
+      return { result: { value: position } };
+    }
+    assert.equal(method, "Page.captureScreenshot");
+    return { data: `CAPTURE-${++captures}` };
+  };
+  const analyses = [];
+  const result = await captureFullPage(f.api, 42, {
+    onFallback: async () => { notified = true; },
+    hasRepeatedViewport: async (dataUrl, dimensions) => {
+      analyses.push(dataUrl);
+      assert.deepEqual(dimensions, { contentHeight: 1599, viewportHeight: 989 });
+      return dataUrl.endsWith("CAPTURE-1");
+    },
+    stitch: async (tiles, dimensions) => {
+      assert.deepEqual(dimensions, { width: 1900, height: 1599 });
+      assert.deepEqual(tiles.map(({ y, height, sourceY }) => ({ y, height, sourceY })), [
+        { y: 0, height: 989, sourceY: 0 },
+        { y: 989, height: 610, sourceY: 379 }
+      ]);
+      assert.deepEqual(tiles.map(({ dataUrl }) => dataUrl), [
+        "data:image/png;base64,CAPTURE-2", "data:image/png;base64,CAPTURE-3"
+      ]);
+      return "data:image/png;base64,STITCHED";
+    }
+  });
+  assert.equal(result, "data:image/png;base64,STITCHED");
+  assert.equal(notified, true);
+  assert.deepEqual(analyses, ["data:image/png;base64,CAPTURE-1", result]);
+  assert.deepEqual(position, { x: 0, y: 300 });
+  assert.equal(f.calls.filter(([name]) => name === "detach").length, 1);
+});
+
 test("expanded viewport captures a short page without a seam even when repetition is absent", async () => {
   const f = fixture();
   let expanded = false;
@@ -315,7 +362,7 @@ test("expanded viewport captures a short page without a seam even when repetitio
   const pngHeader = Buffer.alloc(24);
   Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]).copy(pngHeader);
   pngHeader.writeUInt32BE(800, 16);
-  pngHeader.writeUInt32BE(1500, 20);
+  pngHeader.writeUInt32BE(1599, 20);
   const completePng = pngHeader.toString("base64");
   f.api.debugger.sendCommand = async (target, method, params) => {
     f.calls.push([method, target, params]);
@@ -323,8 +370,8 @@ test("expanded viewport captures a short page without a seam even when repetitio
     if (method === "Emulation.clearDeviceMetricsOverride") { expanded = false; return {}; }
     if (method === "Runtime.evaluate") return { result: { value: params.expression.includes("setTimeout") ? true : { x: 0, y: 100 } } };
     if (method === "Page.getLayoutMetrics") return {
-      cssContentSize: { x: 0, y: 0, width: 800, height: 1500 },
-      cssVisualViewport: { clientWidth: 800, clientHeight: expanded ? 1500 : 800 }
+      cssContentSize: { x: 0, y: 0, width: 800, height: 1599 },
+      cssVisualViewport: { clientWidth: 800, clientHeight: expanded ? 1599 : 989 }
     };
     captures++;
     return { data: captures === 1 ? "REPEATED" : completePng };
@@ -341,7 +388,7 @@ test("expanded viewport captures a short page without a seam even when repetitio
   assert.equal(f.calls.filter(([name]) => name === "Emulation.clearDeviceMetricsOverride").length, 1);
   assert.deepEqual(f.calls.filter(([name]) => name === "Page.captureScreenshot")[1][2], {
     format: "png", fromSurface: true, captureBeyondViewport: false,
-    clip: { x: 0, y: 0, width: 800, height: 1500, scale: 1 }
+    clip: { x: 0, y: 0, width: 800, height: 1599, scale: 1 }
   });
 });
 
@@ -402,7 +449,12 @@ test("repetition sampling uses only the available part of a final partial viewpo
   assert.deepEqual(repetitionBands(1908, 989, 1908), { offset: 989, height: 919 });
   assert.deepEqual(repetitionBands(1908, 987, 1908, 2), { offset: 989, height: 919 });
   assert.deepEqual(repetitionBands(3500, 900, 3500), { offset: 900, height: 900 });
-  assert.equal(repetitionBands(1500, 900, 1500), null);
+  assert.deepEqual(repetitionBands(1500, 900, 1500), { offset: 900, height: 600 });
+  assert.deepEqual(repetitionBands(1599, 989, 1599), { offset: 989, height: 610 });
+  assert.deepEqual(repetitionBands(1200, 1000, 1200), { offset: 1000, height: 200 });
+  assert.equal(repetitionBands(1199, 1000, 1199), null);
+  assert.equal(repetitionBands(1000, 1000, 1000), null);
+  assert.equal(repetitionBands(131, 100, 131), null);
 });
 
 test("repetition search covers a painted viewport that differs from reported metrics", () => {
@@ -410,6 +462,9 @@ test("repetition search covers a painted viewport that differs from reported met
   assert.equal(offsets[0], 860);
   assert.ok(offsets.includes(919));
   assert.equal(new Set(offsets).size, offsets.length);
+  assert.ok(repetitionOffsets(1599, 989, 1599).includes(989));
+  assert.ok(repetitionOffsets(1599, 950, 1599).includes(989));
+  assert.ok(!repetitionOffsets(1599, 989, 1599).includes(1400));
   assert.deepEqual(repetitionOffsets(1500, 0, 1500), []);
 });
 

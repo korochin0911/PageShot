@@ -239,7 +239,7 @@ export async function captureFullPage(api, tabId, imageProcessor = null) {
     if (!result?.data) throw new Error("ページの画像を取得できませんでした。");
     const dataUrl = `data:image/png;base64,${result.data}`;
 
-    if (imageProcessor && viewport && contentClip.height >= viewport.height * 1.8) {
+    if (imageProcessor && viewport && contentClip.height > viewport.height) {
       const repeated = await imageProcessor.hasRepeatedViewport(dataUrl, {
         contentHeight: contentClip.height,
         viewportHeight: viewport.height

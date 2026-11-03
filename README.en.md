@@ -93,6 +93,7 @@ Chromium allows extensions to suggest default keys for up to four commands. As a
 - **Frame sequence**: sends the tab's video stream to an offscreen document through `tabCapture`, then converts frames to images using Canvas. This avoids the normal `captureVisibleTab` limit of two calls per second and does not insert capture UI into the page. No additional external libraries are used.
 - **Full page**: temporarily attaches to the target tab through `chrome.debugger`, then passes `cssContentSize` from `Page.getLayoutMetrics` as the `clip` for `Page.captureScreenshot`. This includes content outside the viewport in both directions. At browser zoom levels other than 100%, the extension captures overlapping viewport images and stitches them together to avoid repeated image content caused by scaling. At 100% zoom, for short pages or pages where repeated content is detected, it attempts to temporarily expand the viewport to the full page height within size limits. If that is unavailable, it scrolls through the page, captures overlapping viewport images, and stitches them together. The original viewport and scroll position are restored afterward.
 - During full-page capture, the browser shows a notification that a debugger is attached. If capture conflicts with Developer Tools or another debugging extension, close them before capturing.
+- Images taller than one viewport are checked for repeated content even when the second viewport is only partially present. Detection requires at least 20% of a viewport and 32 image pixels of matching rows at the end; smaller portions do not provide enough evidence.
 - Scroll through the page first to load lazy-loaded images. The extension does not automatically expand unloaded infinite-scroll content, rows absent from the DOM in virtualized lists, or all content inside independently scrollable containers.
 - Very long pages may exceed the browser's image size or memory limits. Use visible-area capture if this happens.
 - The appearance of videos, animations, fixed elements, and dynamic layouts depends on the browser's rendering.
@@ -146,13 +147,13 @@ Generate a ZIP containing only the files needed to run the extension:
 npm.cmd run package
 ```
 
-The output is `dist/korochin-pageshot-v1.3.1.zip`. The ZIP contains a versioned top-level folder. After extracting it, select that folder with **Load unpacked** in Chrome / Edge. Tests, GitHub Actions, and development files are excluded.
+The output is `dist/korochin-pageshot-v1.3.2.zip`. The ZIP contains a versioned top-level folder. After extracting it, select that folder with **Load unpacked** in Chrome / Edge. Tests, GitHub Actions, and development files are excluded.
 
 On GitHub, pushing a tag whose version matches `manifest.json` runs tests and syntax checks, then automatically creates a release with the ZIP attached.
 
 ```powershell
-git tag v1.3.1
-git push origin v1.3.1
+git tag v1.3.2
+git push origin v1.3.2
 ```
 
 If the tag version does not match `manifest.json`, the workflow fails to prevent an incorrect release. Before the next release, update `manifest.json` and `package.json` to the same version.

@@ -1,7 +1,11 @@
 export function repetitionBands(imageHeight, viewportHeight, contentHeight, offsetDelta = 0) {
   const offset = Math.round(viewportHeight * imageHeight / contentHeight) + offsetDelta;
-  if (!Number.isFinite(offset) || offset <= 0 || imageHeight < offset * 1.8) return null;
-  return { offset, height: Math.min(offset, imageHeight - offset) };
+  const height = Math.min(offset, imageHeight - offset);
+  // A second viewport can be only partially present. Require enough matching
+  // rows for evidence, rather than almost two complete viewports.
+  if (!Number.isFinite(offset) || offset <= 0 || !Number.isFinite(height) ||
+      height < Math.max(32, Math.ceil(offset * 0.2))) return null;
+  return { offset, height };
 }
 
 export function repetitionOffsets(imageHeight, viewportHeight, contentHeight) {
@@ -11,7 +15,7 @@ export function repetitionOffsets(imageHeight, viewportHeight, contentHeight) {
   const offsets = [];
   for (let distance = 0; distance <= radius; distance++) {
     for (const offset of distance === 0 ? [estimated] : [estimated - distance, estimated + distance]) {
-      if (offset > 0 && imageHeight >= offset * 1.8) offsets.push(offset);
+      if (repetitionBands(imageHeight, viewportHeight, contentHeight, offset - estimated)) offsets.push(offset);
     }
   }
   return offsets;

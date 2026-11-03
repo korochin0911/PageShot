@@ -25,17 +25,20 @@ async function detectRepetition(dataUrl, dimensions) {
     const context = canvas.getContext("2d", { willReadFrequently: true });
     // Chromium can paint a screenshot in viewport-sized repeats even when the
     // reported visual viewport differs from the painted viewport height.
-    const probeHeight = Math.min(512, Math.floor(image.height / 3));
-    context.drawImage(image, 0, 0, image.width, probeHeight, 0, 0, sampleWidth, sampleHeight);
-    const firstProbe = context.getImageData(0, 0, sampleWidth, sampleHeight).data;
     for (const offset of repetitionOffsets(image.height, dimensions.viewportHeight, dimensions.contentHeight)) {
+      const bands = repetitionBands(image.height, dimensions.viewportHeight, dimensions.contentHeight,
+        offset - Math.round(dimensions.viewportHeight * image.height / dimensions.contentHeight));
+      if (!bands) continue;
+      // Both probes must stay inside the available portion of the final repeat.
+      const probeHeight = Math.min(512, bands.height);
+      context.clearRect(0, 0, sampleWidth, sampleHeight);
+      context.drawImage(image, 0, 0, image.width, probeHeight, 0, 0, sampleWidth, sampleHeight);
+      const firstProbe = context.getImageData(0, 0, sampleWidth, sampleHeight).data;
       context.clearRect(0, 0, sampleWidth, sampleHeight);
       context.drawImage(image, 0, offset, image.width, probeHeight, 0, 0, sampleWidth, sampleHeight);
       const secondProbe = context.getImageData(0, 0, sampleWidth, sampleHeight).data;
       if (!bandsAreRepeated(firstProbe, secondProbe)) continue;
-      const bands = repetitionBands(image.height, dimensions.viewportHeight, dimensions.contentHeight,
-        offset - Math.round(dimensions.viewportHeight * image.height / dimensions.contentHeight));
-      if (!bands) continue;
+      if (probeHeight === bands.height) return true;
       context.clearRect(0, 0, sampleWidth, sampleHeight);
       context.drawImage(image, 0, 0, image.width, bands.height, 0, 0, sampleWidth, sampleHeight);
       const first = context.getImageData(0, 0, sampleWidth, sampleHeight).data;
