@@ -2,7 +2,7 @@ export const DEFAULT_SEQUENCE_OPTIONS = Object.freeze({ seconds: 3, fps: 10, for
 
 export function sequenceOptions(input = {}) {
   const options = { ...DEFAULT_SEQUENCE_OPTIONS, ...input };
-  if (!Number.isInteger(options.seconds) || options.seconds < 1 || options.seconds > 10 ||
+  if (!Number.isInteger(options.seconds) || options.seconds < 1 || options.seconds > 600 ||
       ![2, 5, 10].includes(options.fps) || !["webp", "png"].includes(options.format) ||
       ![960, 1280, 1920].includes(options.maxWidth)) {
     throw new Error("連続撮影の設定が正しくありません。");

@@ -61,7 +61,7 @@ Closing the captured tab or ending sharing saves the audio collected so far. Rec
 3. Capture ends automatically after the selected duration. The extension saves `screenshot-sequence-<timestamp>.zip` in your downloads folder under `screenshots`.
 4. To finish early, reopen the extension popup and click **途中で停止して保存** (Stop and save). You can also cancel during the countdown.
 
-Available settings are 1 / 2 / 3 / 5 / 10 seconds, a target rate of 2 / 5 / 10 fps, WebP / PNG format, and a maximum width of 960 / 1280 / 1920 px. Settings are retained for the next capture and also apply when using a shortcut.
+Available settings are 1 / 2 / 3 / 5 / 10 / 30 seconds or 1 / 2 / 3 / 5 / 10 minutes (up to 10 minutes), a target rate of 2 / 5 / 10 fps, WebP / PNG format, and a maximum width of 960 / 1280 / 1920 px. Settings are retained for the next capture and also apply when using a shortcut.
 
 The ZIP contains:
 
@@ -147,13 +147,13 @@ Generate a ZIP containing only the files needed to run the extension:
 npm.cmd run package
 ```
 
-The output is `dist/korochin-pageshot-v1.3.2.zip`. The ZIP contains a versioned top-level folder. After extracting it, select that folder with **Load unpacked** in Chrome / Edge. Tests, GitHub Actions, and development files are excluded.
+The output is `dist/korochin-pageshot-v1.3.3.zip`. The ZIP contains a versioned top-level folder. After extracting it, select that folder with **Load unpacked** in Chrome / Edge. Tests, GitHub Actions, and development files are excluded.
 
 On GitHub, pushing a tag whose version matches `manifest.json` runs tests and syntax checks, then automatically creates a release with the ZIP attached.
 
 ```powershell
-git tag v1.3.2
-git push origin v1.3.2
+git tag v1.3.3
+git push origin v1.3.3
 ```
 
 If the tag version does not match `manifest.json`, the workflow fails to prevent an incorrect release. Before the next release, update `manifest.json` and `package.json` to the same version.

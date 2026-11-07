@@ -30,7 +30,8 @@ async function unzipStored(blob) {
 
 test("options are bounded, aspect ratio is retained and late frames skip slots", () => {
   assert.deepEqual(sequenceOptions(), { seconds: 3, fps: 10, format: "webp", maxWidth: 1280 });
-  for (const input of [{ seconds: 0 }, { seconds: 11 }, { fps: 60 }, { seconds: "3" }, { format: "gif" }, { maxWidth: Infinity }]) {
+  assert.equal(sequenceOptions({ seconds: 600 }).seconds, 600);
+  for (const input of [{ seconds: 0 }, { seconds: 601 }, { fps: 60 }, { seconds: "3" }, { format: "gif" }, { maxWidth: Infinity }]) {
     assert.throws(() => sequenceOptions(input));
   }
   assert.deepEqual(fittedSize(3840, 2160, 1280), { width: 1280, height: 720 });

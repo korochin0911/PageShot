@@ -61,7 +61,7 @@ screenshots/
 3. 指定した時間が経つと撮影が自動で終了し、ダウンロード / screenshots に screenshot-sequence-日時.zip を保存します。
 4. 途中で終える場合は拡張アイコンをもう一度開き、「途中で停止して保存」を押します。カウントダウン中はキャンセルできます。
 
-撮影時間は1 / 2 / 3 / 5 / 10秒、目標fpsは2 / 5 / 10、形式はWebP / PNG、最大幅は960 / 1280 / 1920pxから選べます。選んだ設定は次回の撮影やショートカットからの実行にも使われます。
+撮影時間は1 / 2 / 3 / 5 / 10 / 30秒、1 / 2 / 3 / 5 / 10分（最大10分）、目標fpsは2 / 5 / 10、形式はWebP / PNG、最大幅は960 / 1280 / 1920pxから選べます。選んだ設定は次回の撮影やショートカットからの実行にも使われます。
 
 ZIPには次のファイルとフォルダが入ります。
 
@@ -152,13 +152,13 @@ npm.cmd run check
 npm.cmd run package
 ```
 
-出力先は `dist/korochin-pageshot-v1.3.2.zip` です。ZIPの最上位にはバージョン付きのフォルダがあります。展開後、Chrome / Edgeの「パッケージ化されていない拡張機能を読み込む」でそのフォルダを指定できます。`tests`、GitHub Actions、開発用ファイルは含みません。
+出力先は `dist/korochin-pageshot-v1.3.3.zip` です。ZIPの最上位にはバージョン付きのフォルダがあります。展開後、Chrome / Edgeの「パッケージ化されていない拡張機能を読み込む」でそのフォルダを指定できます。`tests`、GitHub Actions、開発用ファイルは含みません。
 
 GitHubでは `manifest.json` と同じバージョンのタグをpushすると、テストと構文チェックを実行し、ZIPを添付したReleaseを自動作成します。
 
 ```powershell
-git tag v1.3.2
-git push origin v1.3.2
+git tag v1.3.3
+git push origin v1.3.3
 ```
 
 タグと `manifest.json` のバージョンが一致しない場合、誤ったリリースを防ぐためワークフローは失敗します。次回リリース時は先に `manifest.json` と `package.json` のバージョンを同じ値へ更新してください。
