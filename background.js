@@ -1,5 +1,5 @@
 import { createCaptureService, DESTINATIONS, MODES } from "./capture.js";
-import { copyDocumentTitleToClipboard, copyPngToClipboard } from "./clipboard.js";
+import { copyDocumentTitleToClipboard, copyPngToClipboard, focusClipboardTab } from "./clipboard.js";
 import { createExclusiveRunner, DEFAULT_SEQUENCE_OPTIONS } from "./sequence.js";
 import { createSequenceService } from "./sequence-service.js";
 import { createAudioService } from "./audio-service.js";
@@ -42,6 +42,7 @@ const imageProcessor = {
 };
 
 async function copyImageToClipboard(dataUrl, tab) {
+  await focusClipboardTab(chrome, tab);
   const [{ result } = {}] = await chrome.scripting.executeScript({
     target: { tabId: tab.id },
     func: copyPngToClipboard,
@@ -87,6 +88,7 @@ async function copyPageTitle(requestedTab) {
     const tab = requestedTab ?? (await chrome.tabs.query({ active: true, lastFocusedWindow: true }))[0];
     if (!Number.isInteger(tab?.id) || tab.id < 0) throw new Error("タイトルを取得するタブが見つかりません。");
     await publishStatus({ state: "capturing", operation: "copy-title", message: "ページタイトルを取得しています…" });
+    await focusClipboardTab(chrome, tab);
     const [{ result } = {}] = await chrome.scripting.executeScript({
       target: { tabId: tab.id },
       func: copyDocumentTitleToClipboard

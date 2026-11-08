@@ -275,6 +275,9 @@ export async function captureFullPage(api, tabId, imageProcessor = null) {
 
 export function explainError(error) {
   const detail = error?.message || String(error);
+  if (/フォーカス/.test(detail)) {
+    return `クリップボードにコピーできませんでした。\n${detail}`;
+  }
   if (/clipboard|クリップボード|NotAllowedError/i.test(detail)) {
     return `クリップボードにコピーできませんでした。拡張を再読み込みして再試行してください。\n${detail}`;
   }

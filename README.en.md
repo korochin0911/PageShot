@@ -17,6 +17,8 @@ The extension's interface and status messages are currently in Japanese. Japanes
 
 Use these shortcuts while the browser has focus. Screenshot copy shortcuts put the captured PNG directly on the clipboard without opening the popup or a save dialog. The page title action copies the current page's `document.title` as text. All actions are also available from the extension icon's popup.
 
+Before copying an image or page title, the extension brings the target tab and window to the front and requests page focus. If focus cannot be obtained, click the page and try again.
+
 ## Installation
 
 1. Enter `chrome://extensions/` in Chrome's address bar, or `edge://extensions/` in Edge.

@@ -31,7 +31,11 @@ test("a restarted worker blocks competing captures while audio records and accep
     } },
     action: { setBadgeText: async () => {}, setBadgeBackgroundColor: async () => {}, setTitle: async () => {} },
     scripting: { executeScript: async () => [{ result: { ok: true, title: "Example" } }] },
-    tabs: { query: async () => [{ id: 42 }] }
+    tabs: {
+      query: async () => [{ id: 42 }],
+      update: async () => ({ id: 42, windowId: 7 })
+    },
+    windows: { update: async () => {} }
   };
   Object.defineProperty(globalThis, "chrome", { configurable: true, value: api });
   try {
