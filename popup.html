@@ -20,11 +20,6 @@
       <button class="capture" data-mode="fullpage" data-destination="download"><span class="label">PNG保存</span><kbd id="capture-fullpage-key">…</kbd></button>
       <button class="capture" data-mode="fullpage" data-destination="clipboard"><span class="label">コピー</span><kbd id="copy-fullpage-key">…</kbd></button>
     </div>
-    <h2>タブの音声</h2>
-    <button id="audio-start" class="capture"><span class="label">録音開始</span><span class="description">WebM音声</span></button>
-    <button id="audio-stop" hidden>録音を停止して保存</button>
-    <p id="audio-elapsed" class="note" hidden></p>
-    <p class="note">このタブの音声を録音します。開始後はメニューを閉じても続きます。停止はもう一度このメニューから。最大60分、マイク音声は含みません。</p>
     <h2>コマ送り画像</h2>
     <div class="sequence-settings">
       <label>撮影時間<select id="sequence-seconds"><option value="1">1秒</option><option value="2">2秒</option><option value="3" selected>3秒</option><option value="5">5秒</option><option value="10">10秒</option><option value="30">30秒</option><option value="60">1分</option><option value="120">2分</option><option value="180">3分</option><option value="300">5分</option><option value="600">10分</option></select></label>
@@ -35,6 +30,11 @@
     <button id="sequence-start" class="capture"><span class="label">2秒後に連続撮影</span><kbd id="capture-sequence-key">…</kbd></button>
     <button id="sequence-stop" hidden>途中で停止して保存</button>
     <p class="note">連番画像＋時刻付き一覧を1つのZIPに保存します。開始後はこのメニューが閉じ、ページを操作できます。</p>
+    <h2>タブの音声</h2>
+    <button id="audio-start" class="capture"><span class="label">録音開始</span><span class="description">WebM音声</span></button>
+    <button id="audio-stop" hidden>録音を停止して保存</button>
+    <p id="audio-elapsed" class="note" hidden></p>
+    <p class="note">このタブの音声を録音します。開始後はメニューを閉じても続きます。停止はもう一度このメニューから。最大60分、マイク音声は含みません。</p>
     <h2>ページ情報</h2>
     <button id="copy-title" class="capture" data-action="copy-title"><span class="label">タイトルをコピー</span><kbd id="copy-title-key">…</kbd></button>
     <p class="destination">保存先：ダウンロード / screenshots</p>

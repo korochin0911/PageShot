@@ -149,13 +149,13 @@ Generate a ZIP containing only the files needed to run the extension:
 npm.cmd run package
 ```
 
-The output is `dist/korochin-pageshot-v1.3.3.zip`. The ZIP contains a versioned top-level folder. After extracting it, select that folder with **Load unpacked** in Chrome / Edge. Tests, GitHub Actions, and development files are excluded.
+The output is `dist/korochin-pageshot-v1.3.5.zip`. The ZIP contains a versioned top-level folder. After extracting it, select that folder with **Load unpacked** in Chrome / Edge. Tests, GitHub Actions, and development files are excluded.
 
 On GitHub, pushing a tag whose version matches `manifest.json` runs tests and syntax checks, then automatically creates a release with the ZIP attached.
 
 ```powershell
-git tag v1.3.3
-git push origin v1.3.3
+git tag v1.3.5
+git push origin v1.3.5
 ```
 
 If the tag version does not match `manifest.json`, the workflow fails to prevent an incorrect release. Before the next release, update `manifest.json` and `package.json` to the same version.

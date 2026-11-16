@@ -154,13 +154,13 @@ npm.cmd run check
 npm.cmd run package
 ```
 
-出力先は `dist/korochin-pageshot-v1.3.3.zip` です。ZIPの最上位にはバージョン付きのフォルダがあります。展開後、Chrome / Edgeの「パッケージ化されていない拡張機能を読み込む」でそのフォルダを指定できます。`tests`、GitHub Actions、開発用ファイルは含みません。
+出力先は `dist/korochin-pageshot-v1.3.5.zip` です。ZIPの最上位にはバージョン付きのフォルダがあります。展開後、Chrome / Edgeの「パッケージ化されていない拡張機能を読み込む」でそのフォルダを指定できます。`tests`、GitHub Actions、開発用ファイルは含みません。
 
 GitHubでは `manifest.json` と同じバージョンのタグをpushすると、テストと構文チェックを実行し、ZIPを添付したReleaseを自動作成します。
 
 ```powershell
-git tag v1.3.3
-git push origin v1.3.3
+git tag v1.3.5
+git push origin v1.3.5
 ```
 
 タグと `manifest.json` のバージョンが一致しない場合、誤ったリリースを防ぐためワークフローは失敗します。次回リリース時は先に `manifest.json` と `package.json` のバージョンを同じ値へ更新してください。
