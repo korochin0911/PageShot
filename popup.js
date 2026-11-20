@@ -1,13 +1,18 @@
 import { DEFAULT_SEQUENCE_OPTIONS, sequenceOptions } from "./sequence.js";
+import { MAX_CAPTURE_DELAY_SECONDS } from "./capture.js";
 
 const statusElement = document.querySelector("#status");
 const buttons = [...document.querySelectorAll(".capture")];
+const captureDelay = document.querySelector("#capture-delay");
+const captureDelaySetting = document.querySelector("#capture-delay-setting");
+const captureCancelButton = document.querySelector("#capture-cancel");
 const startButton = document.querySelector("#sequence-start");
 const stopButton = document.querySelector("#sequence-stop");
 const audioStartButton = document.querySelector("#audio-start");
 const audioStopButton = document.querySelector("#audio-stop");
 const audioElapsed = document.querySelector("#audio-elapsed");
 const settings = [...document.querySelectorAll(".sequence-settings select")];
+captureDelay.max = MAX_CAPTURE_DELAY_SECONDS;
 let currentStatus;
 
 function updateElapsed() {
@@ -23,7 +28,10 @@ function showStatus(status) {
   statusElement.textContent = status.message;
   statusElement.classList.toggle("error", status.state === "error");
   const busy = ["capturing", "preparing", "countdown", "recording", "packaging"].includes(status.state);
-  [...buttons, ...settings].forEach((item) => { item.disabled = busy; });
+  [...buttons, ...settings, captureDelay].forEach((item) => { item.disabled = busy; });
+  const waitingForCapture = status.state === "countdown" && status.operation === "capture-delay";
+  captureDelaySetting.hidden = waitingForCapture;
+  captureCancelButton.hidden = !waitingForCapture;
   stopButton.hidden = status.mode !== "sequence" || !["countdown", "recording"].includes(status.state);
   stopButton.textContent = status.state === "countdown" ? "撮影をキャンセル" : "途中で停止して保存";
   audioStopButton.hidden = status.mode !== "audio" || status.state !== "recording";
@@ -37,14 +45,18 @@ chrome.storage.onChanged.addListener((changes, area) => {
 
 for (const button of buttons.filter((item) => item !== startButton && item !== audioStartButton)) {
   button.addEventListener("click", async () => {
-    buttons.forEach((item) => { item.disabled = true; });
     const copiesTitle = button.dataset.action === "copy-title";
-    showStatus({ state: "capturing", message: copiesTitle ? "ページタイトルを取得しています…" : "撮影しています…" });
+    if (!copiesTitle && !captureDelay.reportValidity()) return;
+    const delaySeconds = copiesTitle ? 0 : captureDelay.valueAsNumber;
+    showStatus({
+      state: delaySeconds > 0 ? "preparing" : "capturing",
+      message: copiesTitle ? "ページタイトルを取得しています…" : delaySeconds > 0 ? "撮影タイマーを準備しています…" : "撮影しています…"
+    });
     try {
       const request = chrome.runtime.sendMessage(copiesTitle ? { type: "copy-title" } : {
-        type: "capture", mode: button.dataset.mode, destination: button.dataset.destination
+        type: "capture", mode: button.dataset.mode, destination: button.dataset.destination, delaySeconds
       });
-      if (copiesTitle || button.dataset.destination === "clipboard") {
+      if (copiesTitle || (delaySeconds === 0 && button.dataset.destination === "clipboard")) {
         // Return focus to the page so the injected Clipboard API call is allowed.
         request.catch(() => {});
         window.close();
@@ -52,6 +64,7 @@ for (const button of buttons.filter((item) => item !== startButton && item !== a
       }
       const result = await request;
       if (!result?.ok) showStatus({ state: "error", message: result?.error || "撮影を開始できませんでした。" });
+      else if (delaySeconds > 0) window.close();
     } catch (error) {
       showStatus({ state: "error", message: `拡張を再読み込みして再試行してください。\n${error.message}` });
     } finally {
@@ -59,6 +72,14 @@ for (const button of buttons.filter((item) => item !== startButton && item !== a
     }
   });
 }
+
+captureCancelButton.addEventListener("click", async () => {
+  captureCancelButton.disabled = true;
+  try {
+    await chrome.runtime.sendMessage({ type: "capture-cancel" });
+  } catch (error) { showStatus({ state: "error", message: error.message }); }
+  finally { captureCancelButton.disabled = false; }
+});
 
 function selectedOptions() {
   return sequenceOptions({

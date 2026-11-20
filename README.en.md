@@ -30,6 +30,14 @@ Before copying an image or page title, the extension brings the target tab and w
 
 Chrome / Edge 118 or later is required. After updating the source files, click the reload button on the browser's extensions page.
 
+## Timed screenshots
+
+1. Open the extension popup on the tab you want to capture and enter a whole number from 0 to 60 in **撮影タイマー** (Screenshot timer). Enter 0 to capture immediately.
+2. Click **PNG保存** (Save PNG) or **コピー** (Copy) under **表示中の領域** (Visible area) or **ページ全体** (Full page). When the countdown starts, the popup closes and the toolbar badge shows the seconds remaining. You can interact with the page while you wait.
+3. Keep the target tab visible until capture. To cancel, reopen the popup and click **タイマー撮影をキャンセル** (Cancel timed screenshot) before the countdown ends.
+
+Keyboard shortcuts capture immediately.
+
 ## Saved files and clipboard results
 
 Files are saved in the `screenshots` subfolder of your browser's configured downloads folder.
@@ -42,7 +50,7 @@ screenshots/
 
 Timestamps use your computer's local time. If a filename already exists, the browser adds a number instead of overwriting it. The extension does not request a save dialog, but browser settings or management policies may still cause one to appear.
 
-The extension icon's badge shows `…` while processing, `WAIT` during the capture countdown, `REC` while recording frames or audio (red for audio), `↓` when a download starts, `✓` when copying to the clipboard succeeds, and `!` on failure. Click the icon for details. The `↓` badge does not guarantee that saving has finished. Check your browser's downloads list (Ctrl + J on Windows) to confirm completion or interruption.
+The extension icon's badge shows `…` while processing, the seconds remaining for a timed screenshot, `WAIT` during the frame sequence countdown, `REC` while recording frames or audio (red for audio), `↓` when a download starts, `✓` when copying to the clipboard succeeds, and `!` on failure. Click the icon for details. The `↓` badge does not guarantee that saving has finished. Check your browser's downloads list (Ctrl + J on Windows) to confirm completion or interruption.
 
 ## Recording tab audio
 
@@ -149,13 +157,13 @@ Generate a ZIP containing only the files needed to run the extension:
 npm.cmd run package
 ```
 
-The output is `dist/korochin-pageshot-v1.3.5.zip`. The ZIP contains a versioned top-level folder. After extracting it, select that folder with **Load unpacked** in Chrome / Edge. Tests, GitHub Actions, and development files are excluded.
+The output is `dist/korochin-pageshot-v1.4.0.zip`. The ZIP contains a versioned top-level folder. After extracting it, select that folder with **Load unpacked** in Chrome / Edge. Tests, GitHub Actions, and development files are excluded.
 
 On GitHub, pushing a tag whose version matches `manifest.json` runs tests and syntax checks, then automatically creates a release with the ZIP attached.
 
 ```powershell
-git tag v1.3.5
-git push origin v1.3.5
+git tag v1.4.0
+git push origin v1.4.0
 ```
 
 If the tag version does not match `manifest.json`, the workflow fails to prevent an incorrect release. Before the next release, update `manifest.json` and `package.json` to the same version.

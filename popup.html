@@ -10,6 +10,10 @@
 <body>
   <header><span class="mark" aria-hidden="true">▣</span><div><h1>PageShot</h1><p>Webページの画像・動き・音声を保存。</p></div></header>
   <main>
+    <div class="capture-timer">
+      <label id="capture-delay-setting">撮影タイマー<input id="capture-delay" type="number" min="0" step="1" value="0" required>秒</label>
+      <button id="capture-cancel" hidden>タイマー撮影をキャンセル</button>
+    </div>
     <h2>表示中の領域</h2>
     <div class="actions">
       <button class="capture" data-mode="viewport" data-destination="download"><span class="label">PNG保存</span><kbd id="capture-viewport-key">…</kbd></button>

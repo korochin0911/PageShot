@@ -1,5 +1,6 @@
 export const MODES = new Set(["viewport", "fullpage"]);
 export const DESTINATIONS = new Set(["download", "clipboard"]);
+export const MAX_CAPTURE_DELAY_SECONDS = 60;
 
 export function filenameFor(mode, now = new Date()) {
   const pad = (n, size = 2) => String(n).padStart(size, "0");

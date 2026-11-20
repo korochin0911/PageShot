@@ -21,16 +21,20 @@ kbd { font: 10px "Segoe UI", sans-serif; white-space: nowrap; border: 1px solid 
 footer { margin-top: 18px; padding-top: 14px; border-top: 1px solid #d6e1d9; display: flex; justify-content: space-between; align-items: center; }
 .link { padding: 0; border: 0; background: none; color: #136f63; cursor: pointer; font: inherit; font-size: 11px; text-decoration: underline; text-underline-offset: 3px; }
 footer span { color: #63736c; font-size: 10px; }
+.capture-timer label:not([hidden]) { display: flex; align-items: center; gap: 7px; font-size: 12px; }
+.capture-timer input { width: 4.5rem; padding: 5px 7px; }
 .sequence-settings { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
 .sequence-settings label { display: flex; flex-direction: column; gap: 4px; font-size: 11px; }
-select { width: 100%; padding: 7px; border: 1px solid #82998a; border-radius: 6px; font: inherit; color: inherit; background: #f5f7f4; }
+select, .capture-timer input { border: 1px solid #82998a; border-radius: 6px; font: inherit; color: inherit; background: #f5f7f4; }
+select { width: 100%; padding: 7px; }
 select option { color: #20352f; background: #f5f7f4; }
-select:focus-visible { outline: 3px solid #1a8878; outline-offset: 2px; }
-#sequence-stop, #audio-stop { width: 100%; padding: 7px 10px; margin-top: 8px; border: 1px solid #ba4938; border-radius: 8px; color: inherit; background: transparent; cursor: pointer; }
+select:focus-visible, .capture-timer input:focus-visible { outline: 3px solid #1a8878; outline-offset: 2px; }
+#sequence-stop, #audio-stop, #capture-cancel { width: 100%; padding: 7px 10px; border: 1px solid #ba4938; border-radius: 8px; color: inherit; background: transparent; cursor: pointer; }
+#sequence-stop, #audio-stop { margin-top: 8px; }
 #audio-elapsed { color: #b42318; font-variant-numeric: tabular-nums; }
 @media (prefers-color-scheme: dark) {
   :root { color: #e2ede7; background: #17221d; }
-  select, select option { color: #e2ede7; background: #17221d; }
+  select, select option, .capture-timer input { color: #e2ede7; background: #17221d; }
   .capture { background: #213128; border-color: #425b4a; }
   .capture:hover { background: #2a3e32; border-color: #73c6ab; }
   header p, h2, .description, .destination, .note, footer span { color: #aec2b5; }
